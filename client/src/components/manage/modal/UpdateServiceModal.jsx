@@ -1,42 +1,52 @@
-import { Button, TextField } from "@mui/material";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Fade from "@mui/material/Fade";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Fade,
+  Modal,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { updateCar } from "../../../api/carApi";
+import { getAllServices, updateService } from "../../../api/serviceApi";
 
-export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
+export const UpdateServiceModal = ({ handleClose, open, service }) => {
   const isMobile = useMediaQuery("(min-width:768px)");
   const dispatch = useDispatch();
-
-  const [name, setName] = useState();
-  const [registration, setRegistration] = useState();
+  useEffect(() => {}, [service]);
   const [file, setFile] = useState([]);
-  useEffect(() => {}, [car]);
-  console.log(car);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const formData = new FormData();
-    formData.append("file", file[0]);
-    formData.append("name", name);
-    formData.append("registration", registration);
-    formData.append("userId", _id);
-    formData.append("_id", carId);
-    const response = await dispatch(updateCar(formData));
-    if (response.payload) {
-      setFile([]);
-      Swal.fire("SUCCESS!", "Car Updated Successfully!", "success");
-    } else {
-      Swal.fire("ERROR!", "Unable to Update Car. Please Try Again!", "error");
+    if (file.length > 0) {
+      formData.append("file", file[0]);
+    }
+    formData.append("_id", service._id);
+    formData.append("name", data.get("name"));
+    formData.append("description", data.get("description"));
+    formData.append("cost", data.get("cost"));
+    const updatedService = await updateService(formData);
+    if (updatedService.success) {
+      const response = await dispatch(getAllServices());
+      if (response.payload) {
+        setFile([]);
+        Swal.fire("SUCCESS!", "Service Updated Successfully!", "success");
+      } else {
+        Swal.fire(
+          "ERROR!",
+          "Unable to Update Service. Please Try Again!",
+          "error"
+        );
+      }
     }
     handleClose();
   };
+
   return (
     <Modal
       open={open}
@@ -61,7 +71,7 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
           }}
         >
           <Typography variant="h5" component="div">
-            Update Car
+            Update Service
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
@@ -72,20 +82,28 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
               name="name"
               autoComplete="name"
               type="text"
-              value={car.name}
-              onChange={(e) => setName(e.target.value)}
+              defaultValue={service.name}
               autoFocus
             />
             <TextField
               margin="normal"
               fullWidth
-              id="registration"
-              label="Registration"
-              name="registration"
+              id="description"
+              label="Description"
+              name="description"
               type="text"
-              autoComplete="registration"
-              value={car.registration}
-              onChange={(e) => setRegistration(e.target.value)}
+              autoComplete="description"
+              defaultValue={service.description}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="cost"
+              label="Cost"
+              name="cost"
+              type="number"
+              autoComplete="cost"
+              defaultValue={service.cost}
             />
             <input
               margin="normal"

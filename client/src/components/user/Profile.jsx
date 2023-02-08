@@ -16,6 +16,7 @@ import { UpdateUserModal } from "./modal/UpdateUserModal";
 import { AddCarModal } from "../car/modal/AddCarModal";
 import { UpdateCarModal } from "../car/modal/UpdateCarModal";
 import Swal from "sweetalert2";
+import config from "../../api/config.json";
 
 export const Profile = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ export const Profile = () => {
   const [selectedCar, setSelectedCar] = useState({
     _id: 0,
   });
-  const { _id, userName, role, contactNumber } = auth.loggedInUser;
+  const { _id, userName, role, name, contactNumber } = auth.loggedInUser;
 
   useEffect(() => {
     dispatch(getCarsByUserId(_id));
@@ -49,6 +50,7 @@ export const Profile = () => {
         _id={_id}
         email={userName}
         role={role}
+        name={name}
         number={contactNumber}
       />
       <AddCarModal
@@ -61,6 +63,7 @@ export const Profile = () => {
         handleClose={handleUpdateCarClose}
         _id={_id}
         carId={selectedCar._id}
+        car={selectedCar}
       />
       <Stack width="100%" height="100%" alignItems="center" gap={1}>
         <Stack width="100%" height="100%" alignItems="center" gap={1}>
@@ -69,14 +72,17 @@ export const Profile = () => {
           </Typography>
           <MuiCard sx={{ bgcolor: "text.disabled" }}>
             <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {userName}
+              <Typography variant="h6" component="div">
+                Name : {name}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {role}
+              <Typography variant="h6" component="div">
+                Email id : {userName}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {contactNumber}
+              <Typography variant="h6" color="text.secondary">
+                Role : {role}
+              </Typography>
+              <Typography variant="h6" color="text.secondary">
+                Contact number : {contactNumber}
               </Typography>
             </CardContent>
             <CardActions>
@@ -124,7 +130,7 @@ export const Profile = () => {
                   <CardMedia
                     component="img"
                     height="140"
-                    image={`http://localhost:5100/${car.image}`}
+                    image={`${config.Backend_URL}${car.image}`}
                     alt="car"
                   />
                   <CardContent>
@@ -142,6 +148,8 @@ export const Profile = () => {
                       onClick={() => {
                         setSelectedCar({
                           _id: car._id,
+                          name: car.name,
+                          registration: car.registration,
                         });
                         handleUpdateCarOpen();
                       }}

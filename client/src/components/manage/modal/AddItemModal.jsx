@@ -1,42 +1,55 @@
-import { Button, TextField } from "@mui/material";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Fade from "@mui/material/Fade";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { useEffect, useState } from "react";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Fade,
+  Modal,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { updateCar } from "../../../api/carApi";
+import { createItem, getAllItems } from "../../../api/itemApi";
 
-export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
+export const AddItemModal = ({ handleClose, open }) => {
   const isMobile = useMediaQuery("(min-width:768px)");
   const dispatch = useDispatch();
-
   const [name, setName] = useState();
-  const [registration, setRegistration] = useState();
+  const [description, setDescription] = useState();
+  const [cost, setCost] = useState();
+  const [quantity, setQuantity] = useState();
+  const [sold, setSold] = useState();
   const [file, setFile] = useState([]);
-  useEffect(() => {}, [car]);
-  console.log(car);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
     const formData = new FormData();
     formData.append("file", file[0]);
     formData.append("name", name);
-    formData.append("registration", registration);
-    formData.append("userId", _id);
-    formData.append("_id", carId);
-    const response = await dispatch(updateCar(formData));
-    if (response.payload) {
-      setFile([]);
-      Swal.fire("SUCCESS!", "Car Updated Successfully!", "success");
-    } else {
-      Swal.fire("ERROR!", "Unable to Update Car. Please Try Again!", "error");
+    formData.append("description", description);
+    formData.append("cost", cost);
+    formData.append("quantity", quantity);
+    formData.append("sold", sold);
+    const item = await createItem(formData);
+    if (item.success) {
+      const response = await dispatch(getAllItems());
+      if (response.payload) {
+        setName(``);
+        setFile([]);
+        setDescription(``);
+        setCost(0);
+        setQuantity(0);
+        setSold(0);
+        Swal.fire("SUCCESS!", "Item Added Successfully!", "success");
+      } else {
+        Swal.fire("ERROR!", "Unable to Add Item. Please Try Again!", "error");
+      }
     }
     handleClose();
   };
+
   return (
     <Modal
       open={open}
@@ -61,7 +74,7 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
           }}
         >
           <Typography variant="h5" component="div">
-            Update Car
+            Add Item
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
@@ -72,20 +85,53 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
               name="name"
               autoComplete="name"
               type="text"
-              value={car.name}
+              value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
             <TextField
               margin="normal"
               fullWidth
-              id="registration"
+              id="description"
               label="Registration"
-              name="registration"
+              name="description"
               type="text"
-              autoComplete="registration"
-              value={car.registration}
-              onChange={(e) => setRegistration(e.target.value)}
+              autoComplete="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="cost"
+              label="Cost"
+              name="cost"
+              type="number"
+              autoComplete="cost"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="quantity"
+              label="quantity"
+              name="Quantity"
+              type="number"
+              autoComplete="quantity"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="sold"
+              label="Sold"
+              name="sold"
+              type="number"
+              autoComplete="sold"
+              value={sold}
+              onChange={(e) => setSold(e.target.value)}
             />
             <input
               margin="normal"
@@ -104,7 +150,7 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
               variant="contained"
               sx={{ mb: 0.5 }}
             >
-              update
+              add
             </Button>
             <Button
               type="button"

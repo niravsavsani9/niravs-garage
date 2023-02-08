@@ -35,6 +35,14 @@ const pages = [
     route: "/about",
     name: "About",
   },
+  {
+    route: "/manage",
+    name: "Manage",
+  },
+  {
+    route: "/showroom",
+    name: "Showroom",
+  },
 ];
 
 const settings = [
@@ -79,6 +87,7 @@ export const Navbar = () => {
           <Link to="/" style={linkStyle}>
             <GarageIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           </Link>
+
           <Typography
             variant="h6"
             noWrap

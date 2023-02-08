@@ -1,42 +1,53 @@
-import { Button, TextField } from "@mui/material";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Fade from "@mui/material/Fade";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Fade,
+  Modal,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { updateCar } from "../../../api/carApi";
+import {
+  getAllCarsForSell,
+  updateCarForSell,
+} from "../../../api/carForSellApi";
 
-export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
+export const UpdateCarForSellModal = ({ handleClose, open, car }) => {
   const isMobile = useMediaQuery("(min-width:768px)");
   const dispatch = useDispatch();
-
-  const [name, setName] = useState();
-  const [registration, setRegistration] = useState();
-  const [file, setFile] = useState([]);
   useEffect(() => {}, [car]);
-  console.log(car);
+  const [file, setFile] = useState([]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const formData = new FormData();
-    formData.append("file", file[0]);
-    formData.append("name", name);
-    formData.append("registration", registration);
-    formData.append("userId", _id);
-    formData.append("_id", carId);
-    const response = await dispatch(updateCar(formData));
-    if (response.payload) {
-      setFile([]);
-      Swal.fire("SUCCESS!", "Car Updated Successfully!", "success");
-    } else {
-      Swal.fire("ERROR!", "Unable to Update Car. Please Try Again!", "error");
+    if (file.length > 0) {
+      formData.append("file", file[0]);
+    }
+    formData.append("_id", car._id);
+    formData.append("name", data.get("name"));
+    formData.append("registration", data.get("registration"));
+    formData.append("cost", data.get("cost"));
+    formData.append("quantity", data.get("quantity"));
+    formData.append("sold", data.get("sold"));
+    const updatedCar = await updateCarForSell(formData);
+    if (updatedCar.success) {
+      const response = await dispatch(getAllCarsForSell());
+      if (response.payload) {
+        setFile([]);
+        Swal.fire("SUCCESS!", "Car Updated Successfully!", "success");
+      } else {
+        Swal.fire("ERROR!", "Unable to Update Car. Please Try Again!", "error");
+      }
     }
     handleClose();
   };
+
   return (
     <Modal
       open={open}
@@ -72,20 +83,48 @@ export const UpdateCarModal = ({ open, handleClose, _id, carId, car }) => {
               name="name"
               autoComplete="name"
               type="text"
-              value={car.name}
-              onChange={(e) => setName(e.target.value)}
+              defaultValue={car.name}
               autoFocus
             />
             <TextField
               margin="normal"
               fullWidth
               id="registration"
-              label="Registration"
+              label="registration"
               name="registration"
               type="text"
               autoComplete="registration"
-              value={car.registration}
-              onChange={(e) => setRegistration(e.target.value)}
+              defaultValue={car.registration}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="cost"
+              label="Cost"
+              name="cost"
+              type="number"
+              autoComplete="cost"
+              defaultValue={car.cost}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="quantity"
+              label="Quantity"
+              name="quantity"
+              type="number"
+              autoComplete="quantity"
+              defaultValue={car.quantity}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="sold"
+              label="Sold"
+              name="sold"
+              type="number"
+              autoComplete="sold"
+              defaultValue={car.sold}
             />
             <input
               margin="normal"
