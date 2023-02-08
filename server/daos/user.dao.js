@@ -8,6 +8,7 @@ const addUser = (user, salt, hash) => {
     hash,
     salt,
     role: user.role,
+    name: "customer",
     contactNumber: user.contactNumber,
   });
   return newUser.save();
@@ -23,6 +24,7 @@ const updateUser = (user, hash, salt) => {
     hash,
     salt,
     role: user.role,
+    name: user.name,
     contactNumber: user.contactNumber,
   };
   return User.findByIdAndUpdate(user._id, updatedUser, {

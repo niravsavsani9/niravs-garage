@@ -62,10 +62,10 @@ const deleteCar = async (req, res) => {
 const findCarByUser = async (req, res) => {
   try {
     const data = await carDao.findCarByUser(req.params.userId);
-    // if (!data || !data.length)
-    //   return res
-    //     .status(404)
-    //     .json({ success: false, msg: "User doesn't own any car!" });
+    if (!data || !data.length)
+      return res
+        .status(404)
+        .json({ success: false, msg: "User doesn't own any car!" });
     res.status(200).json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });

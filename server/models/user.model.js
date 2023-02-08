@@ -8,6 +8,7 @@ const userSchema = new Schema(
     hash: { type: String, required: true },
     salt: { type: String, required: true },
     role: { type: String, required: true },
+    name: { type: String, required: true },
     contactNumber: { type: String, required: true },
   },
   {

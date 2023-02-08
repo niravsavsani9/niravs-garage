@@ -6,6 +6,7 @@ const registerUser = (user, salt, hash) => {
     hash,
     salt,
     role: user.role,
+    name: user.name,
     contactNumber: user.contactNumber,
   });
   return newUser.save();
